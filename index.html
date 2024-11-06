@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo de Damas</title>
+<style>
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 50px);
+  grid-template-rows: repeat(8, 50px);
+}
+
+.cell {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dark {
+  background-color: #b58863;
+}
+
+.light {
+  background-color: #f0d9b5;
+}
+
+.piece {
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+}
+
+.black {
+  background-color: #000;
+}
+
+.red {
+  background-color: #f00;
+}
+</style>
+</head>
+<body>
+<div class="board">
+  <!-- Criar o tabuleiro de damas -->
+</div>
+
+<script>
+const board = document.querySelector('.board');
+let selectedPiece = null;
+
+function createBoard() {
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      if ((row + col) % 2 === 0) {
+        cell.classList.add('light');
+        if (row < 3) {
+          const piece = createPiece('black', row, col);
+          cell.appendChild(piece);
+        } else if (row > 4) {
+          const piece = createPiece('red', row, col);
+          cell.appendChild(piece);
+        }
+        cell.addEventListener('click', () => handleCellClick(row, col));
+      } else {
+        cell.classList.add('dark');
+      }
+      board.appendChild(cell);
+    }
+  }
+}
+
+function createPiece(color, row, col) {
+  const piece = document.createElement('div');
+  piece.classList.add('piece', color);
+  piece.dataset.row = row;
+  piece.dataset.col = col;
+  return piece;
+}
+
+function handleCellClick(row, col) {
+  const clickedCell = board.children[row * 8 + col];
+  const clickedPiece = clickedCell.querySelector('.piece');
+
+  if (selectedPiece) {
+    const selectedCell = board.children[selectedPiece.row * 8 + selectedPiece.col];
+    if (isValidMove(selectedPiece.row, selectedPiece.col, row, col)) {
+      clickedCell.appendChild(selectedPiece.piece);
+      if (Math.abs(selectedPiece.row - row) === 2) {
+        // Captura de peça
+        const capturedRow = (selectedPiece.row + row) / 2;
+        const capturedCol = (selectedPiece.col + col) / 2;
+        const capturedCell = board.children[capturedRow * 8 + capturedCol];
+        capturedCell.removeChild(capturedCell.querySelector('.piece'));
+      }
+      if (color === 'black' && row === 7) {
+        // Promoção de peão preto
+        selectedPiece.piece.classList.add('king');
+      } else if (color === 'red' && row === 0) {
+        // Promoção de peão vermelho
+        selectedPiece.piece.classList.add('king');
+      }
+      selectedPiece = null;
+    } else {
+      alert('Movimento inválido!');
+    }
+  } else {
+    if (clickedPiece) {
+      selectedPiece = { piece: clickedPiece, row, col };
+    }
+  }
+}
+
+function isValidMove(startRow, startCol, endRow, endCol) {
+  // Lógica para validar o movimento da peça
+  // Aqui você pode implementar as regras do jogo de damas
+  return true; // Temporariamente permitindo todos os movimentos
+}
+
+createBoard();
+</script>
+</body>
+</html>
